@@ -65,12 +65,12 @@ export class creaPersoApp extends FormApplication {
 
             }
         });
-        //---------------fonction reset
+
         let reset = html.find('a.reset')[0];
         reset.addEventListener("click", () => {
             initValid.render(true)
         });
-
+        //---------------fonction reset
         function initPerso() {
 
             let abilities = duplicate(target.data.data.abilities);
@@ -97,13 +97,24 @@ export class creaPersoApp extends FormApplication {
 
 
         let raceEl = html.find('select.race')[0];
-        raceEl.addEventListener("change", () => {
-            changeRace()
-        });
+        let histEl = html.find('select.historique')[0];
+        let classeEl = html.find('select.classe')[0];
+
+console.log({
+    target
+})
+        let validButton = html.find('a.applyChanges')[0];
+        validButton.addEventListener('click', applyChanges());
+
+        async function applyChanges() {
+             changeRace();
+             changeHistorique();
+             changeClasse();
+        }
 
 
-        function changeRace() {
-            //let actualRace = target.data.items.type[];
+        //-----------changement race------------
+        async function changeRace() {
             let racename = raceEl.value;
             //récupérer la race et donner l'item de race
 
@@ -208,20 +219,14 @@ export class creaPersoApp extends FormApplication {
         }
         //-----------changement historique------------
 
-
-        let histEl = html.find('select.historique')[0];
-        histEl.addEventListener("change", () => {
-            changeHistorique()
-        });
-
-        function changeHistorique() {
+        async function changeHistorique() {
             let hist = histEl.value;
             //récupérer l'historique 
 
             let packHist = game.packs.get("srd-heros-et-dragons.h-d-historiques");
             let packAptHist = game.packs.get("srd-heros-et-dragons.h-d-aptitudes-historiques");
             let historique = packHist.index.find(h => h.name == hist);
-            packHist.getEntity(historique._id).then(h =>
+            await packHist.getEntity(historique._id).then(h =>
                 target.createOwnedItem(h)
             );
             target.setFlag("srd-heros-et-dragons", "historique.label", historique.name);
@@ -248,13 +253,7 @@ export class creaPersoApp extends FormApplication {
 
 
         }
-        //-------selecteur de classe------------------
-
-        let classeEl = html.find('select.classe')[0];
-        console.log(classeEl)
-        classeEl.addEventListener("change", () => {
-            changeClasse()
-        });
+        //-------changement de classe------------------
 
         async function changeClasse() {
             let classeName = classeEl.value;
