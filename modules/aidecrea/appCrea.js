@@ -99,6 +99,8 @@ export class creaPersoApp extends FormApplication {
         let raceEl = html.find('select.race')[0];
         let histEl = html.find('select.historique')[0];
         let classeEl = html.find('select.classe')[0];
+<<<<<<< HEAD
+=======
 
 console.log({
     target
@@ -111,7 +113,13 @@ console.log({
              changeHistorique();
              changeClasse();
         }
+>>>>>>> 7131ceaaa259188bb792c4cd739b2939b27d5ec9
 
+console.log({
+    target
+})
+        let validButton = html.find('a.applyChanges')[0];
+        validButton.addEventListener('click', applyChanges());
 
         //-----------changement race------------
         async function changeRace() {
