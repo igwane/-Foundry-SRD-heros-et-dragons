@@ -22,7 +22,8 @@ export  function levelUp(html, data) {
     let clName = b.previousElementSibling.lastElementChild.innerText.replace(/\s/g, "");
 
     let targetClass = targetActor.data.items.find(cl => cl.name == clName);
-    let newlvl = targetClass.data.levels + 1;
+console.log(targetClass);
+    let newlvl = targetClass.data.data.levels + 1;
 
 
     //------dialog de valid
@@ -57,14 +58,15 @@ export  function levelUp(html, data) {
 
   async function ApplyClassUp(targetActor, targetClass) {
     const update = {
-      _id: targetClass._id,
+      _id: targetClass.id,
       data: {
-        levels: targetClass.data.levels + 1,
-
+          levels: targetClass.data.data.levels + 1,
       },
     };
+
     console.log({update})
-    await targetActor.updateEmbeddedEntity("OwnedItem", update);
+
+    await targetActor.updateEmbeddedDocuments("Item", Array(update));
     ui.notifications.info(targetActor.name + " passe au niveau " + update.data.levels + "  dans sa classe " + targetClass.name);
   }
 
