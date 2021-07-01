@@ -57,16 +57,16 @@ console.log(targetClass);
   };
 
   async function ApplyClassUp(targetActor, targetClass) {
+
     const update = {
-      _id: targetClass.id,
+      _id: targetClass.data._id,
       data: {
+          _id: targetClass.data._id,
           levels: targetClass.data.data.levels + 1,
       },
     };
 
-    console.log({update})
-
-    await targetActor.updateEmbeddedDocuments("Item", Array(update));
+    await targetActor.updateEmbeddedDocuments("Item", [update]);
     ui.notifications.info(targetActor.name + " passe au niveau " + update.data.levels + "  dans sa classe " + targetClass.name);
   }
 

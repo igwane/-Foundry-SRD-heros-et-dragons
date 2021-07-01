@@ -115,10 +115,13 @@ export class creaPersoApp extends FormApplication {
             let packRace = game.packs.get("srd-heros-et-dragons.h-d-races");
             let packTrRaciaux = game.packs.get("srd-heros-et-dragons.h-d-traits-raciaux");
             let race = packRace.index.find(r => r.name == racename);
-            packRace.getEntity(race._id).then(r =>
-                target.createOwnedItem(r)
-            );
-            target.setFlag("srd-heros-et-dragons", "race", race.name);
+
+            packRace.getDocument(race._id).then(r => 
+                target.createEmbeddedDocuments("Item",[r.data])
+             );
+
+            target.setFlag("srd-heros-et-dragons", "data.race", race.name);
+
             choix.race = {
                 label: race.name
             };
@@ -132,10 +135,9 @@ export class creaPersoApp extends FormApplication {
                     let indexTrait = trait.name.indexOf(racename);
                     if (indexTrait !== -1) {
                         traitsRacOk.push(trait);
-                        packTrRaciaux.getEntity(trait._id).then(trait => {
-                            target.createOwnedItem(trait);
-
-                        })
+                        packTrRaciaux.getDocument(trait._id).then(trait => {
+                            target.createEmbeddedDocuments("Item",[trait.toObject]);
+                        });
                     }
                     switch (racename) {
                         case "Homme serpent Kubea ghinduk":
@@ -144,7 +146,7 @@ export class creaPersoApp extends FormApplication {
                             indexTrait = trait.name.indexOf("(Homme serpent)");
                             if (indexTrait !== -1) {
                                 traitsRacOk.push(trait);
-                                packTrRaciaux.getEntity(trait._id).then(trait => target.createOwnedItem(trait))
+                                packTrRaciaux.getDocument(trait._id).then(trait => target.createEmbeddedDocuments("Item",[trait.data]))
                             }
                             break;
                         case "Elfe d'Aether":
@@ -153,7 +155,7 @@ export class creaPersoApp extends FormApplication {
                             indexTrait = trait.name.indexOf("(Elfe)");
                             if (indexTrait !== -1) {
                                 traitsRacOk.push(trait);
-                                packTrRaciaux.getEntity(trait._id).then(trait => target.createOwnedItem(trait))
+                                packTrRaciaux.getDocument(trait._id).then(trait => target.createEmbeddedDocuments("Item",[trait.data]))
                             }
                             break;
                         case "Gnome des fées":
@@ -162,7 +164,7 @@ export class creaPersoApp extends FormApplication {
                             indexTrait = trait.name.indexOf("(Gnome)");
                             if (indexTrait !== -1) {
                                 traitsRacOk.push(trait);
-                                packTrRaciaux.getEntity(trait._id).then(trait => target.createOwnedItem(trait))
+                                packTrRaciaux.getDocument(trait._id).then(trait => target.createEmbeddedDocuments("Item",[trait.data]))
                             }
                             break;
                         case "Halfelin Grand-sabot":
@@ -170,7 +172,7 @@ export class creaPersoApp extends FormApplication {
                             indexTrait = trait.name.indexOf("(Halfelin)");
                             if (indexTrait !== -1) {
                                 traitsRacOk.push(trait);
-                                packTrRaciaux.getEntity(trait._id).then(trait => target.createOwnedItem(trait))
+                                packTrRaciaux.getDocument(trait._id).then(trait => target.createEmbeddedDocuments("Item",[trait.data]))
                             }
                             break;
                         case "Nain des laves":
@@ -179,7 +181,7 @@ export class creaPersoApp extends FormApplication {
                             indexTrait = trait.name.indexOf("(Nain)");
                             if (indexTrait !== -1) {
                                 traitsRacOk.push(trait);
-                                packTrRaciaux.getEntity(trait._id).then(trait => target.createOwnedItem(trait))
+                                packTrRaciaux.getDocument(trait._id).then(trait => target.createEmbeddedDocuments("Item",[trait.data]))
                             }
                             break;
                         case "Sangdragon Airain":
@@ -195,7 +197,7 @@ export class creaPersoApp extends FormApplication {
                             indexTrait = trait.name.indexOf("(Sangdragon)");
                             if (indexTrait !== -1) {
                                 traitsRacOk.push(trait);
-                                packTrRaciaux.getEntity(trait._id).then(trait => target.createOwnedItem(trait))
+                                packTrRaciaux.getDocument(trait._id).then(trait => target.createEmbeddedDocuments("Item",[trait.data]))
                             }
                             break;
                     }
@@ -203,7 +205,7 @@ export class creaPersoApp extends FormApplication {
                 }
                 let flagsTraitsRac = []
                 for (let t of traitsRacOk) {
-                    flagsTraitsRac.push(t.name)
+                    flagsTraitsRac.push(t.name);
                 }
                 target.setFlag("srd-heros-et-dragons", "race.traits", flagsTraitsRac);
 
@@ -228,8 +230,8 @@ export class creaPersoApp extends FormApplication {
             let packHist = game.packs.get("srd-heros-et-dragons.h-d-historiques");
             let packAptHist = game.packs.get("srd-heros-et-dragons.h-d-aptitudes-historiques");
             let historique = packHist.index.find(h => h.name == hist);
-            packHist.getEntity(historique._id).then(h =>
-                target.createOwnedItem(h)
+            packHist.getDocument(historique._id).then(h =>
+                target.createEmbeddedDocuments("Item",[h.data])
             );
             target.setFlag("srd-heros-et-dragons", "historique.label", historique.name);
 
@@ -242,7 +244,7 @@ export class creaPersoApp extends FormApplication {
                     let indexApt = apt.name.indexOf(hist + ")");
                     if (indexApt !== -1) {
                         aptHistOK.push(apt);
-                        packAptHist.getEntity(apt._id).then(apt => target.createOwnedItem(apt))
+                        packAptHist.getDocument(apt._id).then(apt => target.createEmbeddedDocuments("Item",[apt.data]))
                     }
                 }
                 let flagsAptHist = [];
@@ -280,22 +282,21 @@ export class creaPersoApp extends FormApplication {
                 let pckName = id.split(".")[1] + "." + id.split(".")[2];
                 let idF = id.split(".")[3];
                 let packfeat = game.packs.get(pckName);
-                let feat = packfeat.index.find(f => f._id == idF);
-                packfeat.getEntity(idF).then(f =>
-                    target.createOwnedItem(f)
+                let feat = packfeat.index.find(f => f.id == idF);
+                packfeat.getDocument(idF).then(f =>
+                    target.createEmbeddedDocuments("Item",[f.data])
                 );
             }
 
             const packClass = game.packs.get("srd-heros-et-dragons.h-d-classes-et-specialisations")
             packClass.getIndex().then(i => {
                 let cl = packClass.index.find(c => c.name === classeName);
-                packClass.getEntity(cl._id).then(c => {
-                    target.sheet._onDropItemCreate(c);
+                packClass.getDocument(cl._id).then(c => {
+                    target.sheet._onDropItemCreate(c.data);
                     target.setFlag("srd-heros-et-dragons", "classe", c.name);
                     target.setFlag("srd-heros-et-dragons", "sous-classe", c.data.subclass);
                 });
             });
-
         };
 
 

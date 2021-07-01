@@ -18,7 +18,7 @@ export async function checkSubClass(targetActor, targetClass) {
 
     let clName = targetClass.name.toLowerCase();
     let scList = ClassFeaturesHD[clName].subclasses;
-    let newlvl = targetClass.data.levels + 1;
+    let newlvl = targetClass.data.data.levels + 1;
     //enclencher le choix de sous-classe selon classe et niveau
 
     switch (clName) {
@@ -30,19 +30,19 @@ export async function checkSubClass(targetActor, targetClass) {
         case "rôdeur":
         case "roublard":
         case "sorcier":
-            if (newlvl == 3 && targetClass.data.subclass === "") {
+            if (newlvl == 3 && targetClass.data.data.subclass === "") {
                 subClassChoix = true
             };
             break;
         case "druide":
         case "magicien":
-            if (newlvl == 2 && targetClass.data.subclass === "") {
+            if (newlvl == 2 && targetClass.data.data.subclass === "") {
                 subClassChoix = true
             };
             break;
         case "clerc":
         case "ensorceleur":
-            if (targetClass.data.levels == 1 && targetClass.data.subclass === "") {
+            if (targetClass.data.data.levels == 1 && targetClass.data.data.subclass === "") {
                 newlvl=1;
                 subClassChoix = true
             };
@@ -86,26 +86,23 @@ export async function checkSubClass(targetActor, targetClass) {
 
         async function giveSubClass(newsbcl) {
             //-----udater la classe avec la sous classe 
-            console.log({
-                newsbcl
-            })
             const update = {
-                _id: targetClass._id,
+                _id: targetClass.data._id,
                 name: targetClass.name,
                 data: {
                     subclass: newsbcl
                 }
             };
 
-            await targetActor.updateEmbeddedEntity("OwnedItem", update);
+            await targetActor.updateEmbeddedDocuments("Item", [update]);
 
 
             //-------donner l'item feat de sous-classe
             let packClass = game.packs.get("srd-heros-et-dragons.h-d-classes-et-specialisations");
             let sbcItem = "[" + targetClass.name.toLowerCase().replace("'", "") + "] " + newsbcl;
             let subcl = packClass.index.find(sc => sc.name.slugify() === sbcItem.slugify());
-             packClass.getEntity(subcl._id).then(sbc => {
-                targetActor.createOwnedItem(sbc);
+            packClass.getDocument(subcl.id).then(sbc => {
+                targetActor.createEmbeddedDocuments("Item",[sbc]);
             });
             //--------mettre le flag de sous-classe
             await targetActor.setFlag("srd-heros-et-dragons", "subclasse.label", subcl.name);
@@ -120,22 +117,19 @@ export async function checkSubClass(targetActor, targetClass) {
                     ids=f;
                 }
             }
-
            
             for (let id of ids){
               
                 let mod=id.split(".")[1];
                 let pckName=id.split(".")[1]+"."+id.split(".")[2];
                 let idF=id.split(".")[3];
-                console.log(pckName)
 
                 let packfeat = game.packs.get(pckName);
                 let feat = packfeat.index.find(f => f._id == idF);
-                packfeat.getEntity(idF).then(f =>
-                    targetActor.createOwnedItem(f)
-                );
-              
 
+                packfeat.getDocument(idF).then(f =>
+                    targetActor.createEmbeddedDocuments("Item",[f.data])
+                );
             }
         };
     }
